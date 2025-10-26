@@ -8,8 +8,11 @@ from .schemas import ChatMessage, RoomMemory, PersonaConfig, LLMParams
 
 
 class RoomState:
-    def __init__(self, id: str, persona: PersonaConfig, params: LLMParams):
+    def __init__(self, id: str, persona: PersonaConfig, params: LLMParams, name: str = "Untitled Room", admin: str = "", created_at: float = None):
         self.id = id
+        self.name = name
+        self.admin = admin
+        self.created_at = created_at if created_at is not None else time.time()
         self.users: Set[str] = set()
         self.history: List[ChatMessage] = []
         self.memory: RoomMemory = RoomMemory()

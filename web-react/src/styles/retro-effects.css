@@ -1,0 +1,294 @@
+/* CRT Scanlines Effect */
+.crt-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 4px;
+  animation: scanlines 0.5s steps(60) infinite;
+}
+
+@keyframes scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+
+/* CRT Screen Curvature */
+.crt-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+/* Retro Vignette Effect */
+.crt-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9997;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+/* Screen Flicker Animation */
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.97;
+  }
+  5% {
+    opacity: 0.98;
+  }
+  10% {
+    opacity: 0.97;
+  }
+  15% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.97;
+  }
+  25% {
+    opacity: 0.98;
+  }
+  30% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.98;
+  }
+  40% {
+    opacity: 0.97;
+  }
+  45% {
+    opacity: 0.99;
+  }
+  50% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.98;
+  }
+  60% {
+    opacity: 0.99;
+  }
+  65% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.97;
+  }
+  75% {
+    opacity: 0.98;
+  }
+  80% {
+    opacity: 0.99;
+  }
+  85% {
+    opacity: 0.97;
+  }
+  90% {
+    opacity: 0.98;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+/* RGB Chromatic Aberration (CRT color bleeding) */
+.crt-rgb {
+  position: relative;
+}
+
+.crt-rgb::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 2px;
+  text-shadow: -2px 0 #ff00ff;
+  top: 0;
+  color: inherit;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-1 2s infinite linear alternate-reverse;
+}
+
+.crt-rgb::after {
+  content: attr(data-text);
+  position: absolute;
+  left: -2px;
+  text-shadow: 2px 0 #00ffff;
+  top: 0;
+  color: inherit;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-2 3s infinite linear alternate-reverse;
+}
+
+/* Retro Grid Background */
+.retro-grid {
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* CRT Glow Effect */
+.crt-glow {
+  text-shadow: 
+    0 0 5px rgba(139, 92, 246, 0.8),
+    0 0 10px rgba(139, 92, 246, 0.6),
+    0 0 15px rgba(139, 92, 246, 0.4),
+    0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Retro Border */
+.retro-border {
+  border: 3px solid;
+  border-image: linear-gradient(
+    45deg,
+    #8b5cf6,
+    #ec4899,
+    #06b6d4,
+    #8b5cf6
+  ) 1;
+  box-shadow: 
+    inset 0 0 10px rgba(139, 92, 246, 0.5),
+    0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+/* Retro Button Press Effect */
+.retro-button {
+  position: relative;
+  border: 2px solid currentColor;
+  box-shadow: 
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+    0 0 15px rgba(139, 92, 246, 0.5);
+  transition: all 0.1s;
+}
+
+.retro-button:active {
+  box-shadow: 
+    inset 2px 2px 0 rgba(0, 0, 0, 0.5),
+    inset -2px -2px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(2px);
+}
+
+/* Retro Text */
+.retro-text {
+  font-family: 'Courier New', 'Courier', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Static Noise Overlay */
+.crt-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9996;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  animation: noise 0.2s infinite;
+}
+
+@keyframes noise {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -5%); }
+  20% { transform: translate(-10%, 5%); }
+  30% { transform: translate(5%, -10%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-10%, 5%); }
+  60% { transform: translate(15%, 0); }
+  70% { transform: translate(0, 10%); }
+  80% { transform: translate(-15%, 0); }
+  90% { transform: translate(10%, 5%); }
+  100% { transform: translate(5%, 0); }
+}
+
+/* Retro Bevel Effect */
+.retro-bevel {
+  box-shadow: 
+    inset -4px -4px 8px rgba(0, 0, 0, 0.5),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* CRT Refresh Line */
+.crt-refresh-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 10000;
+  animation: refresh-line 3s linear infinite;
+}
+
+@keyframes refresh-line {
+  0% {
+    top: 0;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Retro Pixel Border */
+.pixel-border {
+  border: 4px solid;
+  border-image: 
+    repeating-linear-gradient(
+      0deg,
+      #8b5cf6 0px,
+      #8b5cf6 4px,
+      #ec4899 4px,
+      #ec4899 8px
+    ) 4;
+}
+

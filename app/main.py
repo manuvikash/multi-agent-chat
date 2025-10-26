@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import json
+import uuid
 from pathlib import Path
+from typing import Dict
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import httpx
 
 from .config import settings, load_default_persona
@@ -21,7 +24,12 @@ app = FastAPI()
 # Add CORS for React dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +40,13 @@ web_dir = Path(__file__).resolve().parents[1] / "web"
 app.mount("/static", StaticFiles(directory=str(web_dir)), name="static")
 
 manager = ConnectionManager()
-rooms: dict = {}
+rooms: Dict[str, RoomState] = {}
+
+
+class CreateRoomRequest(BaseModel):
+    name: str
+    admin: str
+    initial_bot: str
 
 
 @app.on_event("startup")
@@ -57,6 +71,82 @@ async def get_bots():
     return JSONResponse(BOT_METADATA)
 
 
+@app.post("/api/rooms/create")
+async def create_room(request: CreateRoomRequest):
+    """Create a new chat room"""
+    # Validate bot exists
+    if request.initial_bot not in BOT_PERSONAS:
+        raise HTTPException(status_code=400, detail=f"Invalid bot: {request.initial_bot}")
+    
+    # Generate unique room ID
+    room_id = str(uuid.uuid4())
+    
+    # Load default persona and params
+    d = load_default_persona()
+    persona = PersonaConfig(**d)
+    params = LLMParams()
+    
+    # Create room with metadata
+    room = RoomState(
+        id=room_id,
+        persona=persona,
+        params=params,
+        name=request.name,
+        admin=request.admin
+    )
+    
+    # Set initial bot
+    room.active_bots = {request.initial_bot}
+    
+    # Store room
+    rooms[room_id] = room
+    
+    return JSONResponse({
+        "room_id": room_id,
+        "name": request.name,
+        "admin": request.admin,
+        "initial_bot": request.initial_bot
+    })
+
+
+@app.get("/api/rooms")
+async def get_rooms():
+    """Get list of all available rooms"""
+    room_list = []
+    for room_id, room in rooms.items():
+        room_list.append({
+            "room_id": room_id,
+            "name": room.name,
+            "admin": room.admin,
+            "created_at": room.created_at,
+            "participant_count": len(room.users),
+            "active_bots": list(room.active_bots)
+        })
+    
+    # Sort by created_at (newest first)
+    room_list.sort(key=lambda x: x["created_at"], reverse=True)
+    
+    return JSONResponse(room_list)
+
+
+@app.get("/api/rooms/{room_id}")
+async def get_room(room_id: str):
+    """Get details of a specific room"""
+    if room_id not in rooms:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    room = rooms[room_id]
+    return JSONResponse({
+        "room_id": room_id,
+        "name": room.name,
+        "admin": room.admin,
+        "created_at": room.created_at,
+        "participants": list(room.users),
+        "participant_count": len(room.users),
+        "active_bots": list(room.active_bots)
+    })
+
+
 @app.get("/")
 async def index():
     return FileResponse(str(web_dir / "index.html"))
@@ -66,12 +156,14 @@ async def index():
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
     await manager.connect(room_id, websocket)
     try:
-        # create room if missing
+        # Check if room exists (don't auto-create anymore)
         if room_id not in rooms:
-            d = load_default_persona()
-            persona = PersonaConfig(**d)
-            params = LLMParams()
-            rooms[room_id] = RoomState(room_id, persona, params)
+            await websocket.send_text(json.dumps({
+                "type": "error", 
+                "message": "Room not found. Please create or join an existing room."
+            }))
+            await websocket.close()
+            return
 
         room: RoomState = rooms[room_id]
 
@@ -151,7 +243,15 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 asyncio.create_task(_run_orchestrator())
 
             elif typ == "bot.add":
+                user = obj.get("user")
                 bot_id = obj.get("bot_id")
+                # Check if user is admin
+                if user != room.admin:
+                    await websocket.send_text(json.dumps({
+                        "type": "error", 
+                        "message": "Only the room admin can add bots"
+                    }))
+                    continue
                 if bot_id in BOT_PERSONAS:
                     room.active_bots.add(bot_id)
                     await manager.broadcast(room_id, {
@@ -161,7 +261,15 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                         "bot_name": BOT_PERSONAS[bot_id].name
                     })
             elif typ == "bot.remove":
+                user = obj.get("user")
                 bot_id = obj.get("bot_id")
+                # Check if user is admin
+                if user != room.admin:
+                    await websocket.send_text(json.dumps({
+                        "type": "error", 
+                        "message": "Only the room admin can remove bots"
+                    }))
+                    continue
                 if bot_id in room.active_bots:
                     room.active_bots.remove(bot_id)
                     await manager.broadcast(room_id, {
