@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import BotSelection from './pages/BotSelection';
 import RoomSelection from './pages/RoomSelection';
 import ChatRoom from './pages/ChatRoom';
-import './App.css';
 
 export default function App() {
   return (

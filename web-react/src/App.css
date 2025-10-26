@@ -1,5 +1,0 @@
-/* App-level styles */
-#app-container {
-  @apply w-full min-h-screen bg-dark-bg;
-}
-
