@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Check, Plus, Skull } from 'lucide-react';
-import { cn } from '../lib/utils';
+import './BotSelector.css';
 
 const BOT_INFO = {
   'gooner': { emoji: '😎', name: 'Gooner', tagline: 'The chillest stoic chad', color: '#667eea' },
@@ -17,92 +16,40 @@ export default function BotSelector({ activeBots, onAddBot, onRemoveBot, onClose
   const [bots, setBots] = useState([]);
 
   useEffect(() => {
+    // Convert local bot info to array
     setBots(Object.entries(BOT_INFO).map(([id, info]) => ({ id, ...info })));
   }, []);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-      onClick={onClose}
-    >
-      <div
-        className={cn(
-          "w-full max-w-4xl bg-card border border-border rounded-xl",
-          "shadow-2xl card-glow overflow-hidden"
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-secondary/50">
-          <div className="flex items-center gap-3">
-            <Skull className="w-6 h-6 text-primary" />
-            <h3 className="text-xl font-bold text-foreground">AI Personalities</h3>
-          </div>
-          <button
-            onClick={onClose}
-            className={cn(
-              "p-2 rounded-full hover:bg-secondary",
-              "text-muted-foreground hover:text-foreground",
-              "transition-all duration-200"
-            )}
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <div className="bot-selector-overlay" onClick={onClose}>
+      <div className="bot-selector-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="panel-header">
+          <h3>🎭 AI Personalities</h3>
+          <button className="close-btn" onClick={onClose}>×</button>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6 max-h-[70vh] overflow-y-auto">
+        
+        <div className="bot-grid">
           {bots.map(bot => {
             const isActive = activeBots.includes(bot.id);
             return (
               <div
                 key={bot.id}
-                className={cn(
-                  "p-4 rounded-lg border-2 transition-all duration-200",
-                  "bg-secondary/30 hover:bg-secondary/50",
-                  isActive && "ring-2 ring-offset-2 ring-offset-background"
-                )}
-                style={{
-                  borderColor: bot.color,
-                  ...(isActive && { ringColor: bot.color })
-                }}
+                className={`bot-card ${isActive ? 'active' : ''}`}
+                style={{ borderColor: bot.color }}
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <span className="text-3xl">{bot.emoji}</span>
-                  <div className="flex-1">
-                    <h4
-                      className="font-bold text-lg leading-tight"
-                      style={{ color: bot.color }}
-                    >
-                      {bot.name}
-                    </h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {bot.tagline}
-                    </p>
-                  </div>
+                <div className="bot-card-header">
+                  <span className="bot-emoji">{bot.emoji}</span>
+                  <h4 style={{ color: bot.color }}>{bot.name}</h4>
                 </div>
+                <p className="bot-tagline">{bot.tagline}</p>
                 <button
+                  className={`toggle-bot-btn ${isActive ? 'remove' : 'add'}`}
                   onClick={() => isActive ? onRemoveBot(bot.id) : onAddBot(bot.id)}
-                  className={cn(
-                    "w-full px-4 py-2 rounded-md font-medium text-sm",
-                    "transition-all duration-200 flex items-center justify-center gap-2",
-                    isActive
-                      ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      : "text-white hover:opacity-90"
-                  )}
                   style={{
-                    backgroundColor: isActive ? undefined : bot.color
+                    backgroundColor: isActive ? '#e74c3c' : bot.color
                   }}
                 >
-                  {isActive ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Active
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" />
-                      Add
-                    </>
-                  )}
+                  {isActive ? '✓ Active' : '+ Add'}
                 </button>
               </div>
             );
