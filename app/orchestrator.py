@@ -414,9 +414,21 @@ async def apply_structured_response(client: httpx.AsyncClient, resp_obj: Any, ro
 async def should_bot_respond(client: httpx.AsyncClient, room: RoomState, bot_persona, user_message: str) -> bool:
     """Determine if this specific bot should respond to the user's message based on its personality and the context."""
     
-    # Always respond if directly mentioned
-    if f"@{bot_persona.name}" in user_message or bot_persona.name.lower() in user_message.lower():
+    # Always respond if directly mentioned (check @ mention or any part of their name)
+    user_message_lower = user_message.lower()
+    
+    # Check for @ mention with full name
+    if f"@{bot_persona.name}" in user_message:
         return True
+    
+    # Split name into parts and check if ANY part is mentioned
+    # e.g., "Sasuke Uchiha" -> ["sasuke", "uchiha"]
+    name_parts = bot_persona.name.lower().split()
+    for part in name_parts:
+        # Only check name parts that are at least 3 characters (avoid false matches on short words)
+        if len(part) >= 3 and part in user_message_lower:
+            print(f"[DEBUG] Bot {bot_persona.name} mentioned via name part: '{part}'")
+            return True
     
     # Get recent context
     recent_msgs = room.tail_by_tokens(2000)[-5:] if len(room.history) > 0 else []

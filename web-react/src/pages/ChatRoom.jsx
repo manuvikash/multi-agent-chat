@@ -31,7 +31,22 @@ export default function ChatRoom() {
         content: data.content,
         timestamp: data.ts || Date.now()
       }]);
+    } else if (data.type === 'room_state') {
+      // Initial room state with active bots
+      console.log('Received room state:', data);
+      if (data.active_bots) {
+        setActiveBots(data.active_bots);
+      }
     } else if (data.type === 'system') {
+      // Handle bot add/remove events
+      if (data.event === 'bot.added' && data.bot_id) {
+        console.log('Bot added:', data.bot_id);
+        setActiveBots(prev => [...new Set([...prev, data.bot_id])]);
+      } else if (data.event === 'bot.removed' && data.bot_id) {
+        console.log('Bot removed:', data.bot_id);
+        setActiveBots(prev => prev.filter(id => id !== data.bot_id));
+      }
+      
       setMessages(prev => [...prev, {
         id: Date.now() + Math.random(),
         user: 'SYSTEM',

@@ -166,6 +166,15 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             return
 
         room: RoomState = rooms[room_id]
+        
+        # Send room state including active bots to the connecting client
+        await websocket.send_text(json.dumps({
+            "type": "room_state",
+            "room_id": room_id,
+            "name": room.name,
+            "admin": room.admin,
+            "active_bots": list(room.active_bots)
+        }))
 
         while True:
             data = await websocket.receive_text()
