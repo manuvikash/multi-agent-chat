@@ -1,4 +1,4 @@
-import './MessageBubble.css';
+import { cn } from '../lib/utils';
 
 const BOT_COLORS = {
   'Gooner': '#667eea',
@@ -18,13 +18,6 @@ export default function MessageBubble({ message, currentUser }) {
   const isBot = message.user !== currentUser && message.user !== 'SYSTEM';
   const isSystem = message.isSystem || message.user === 'SYSTEM';
 
-  const getBotClass = () => {
-    if (message.user === 'GoodBot') return 'good-bot';
-    if (message.user === 'EvilBot') return 'evil-bot';
-    if (isBot) return 'bot';
-    return '';
-  };
-
   const getBotColor = () => {
     return BOT_COLORS[message.user] || '#667eea';
   };
@@ -32,8 +25,13 @@ export default function MessageBubble({ message, currentUser }) {
   if (isSystem) {
     const isDebate = message.content.includes('Debate') || message.content.includes('debate');
     return (
-      <div className={`message system ${isDebate ? 'debate' : ''}`}>
-        <div className="message-bubble">
+      <div className="flex justify-center my-4">
+        <div className={cn(
+          "px-4 py-2 rounded-full text-sm font-medium",
+          "bg-secondary/50 border border-border",
+          "text-muted-foreground",
+          isDebate && "border-primary/50 text-primary"
+        )}>
           {isDebate && '🎭 '}
           {message.content}
         </div>
@@ -42,22 +40,48 @@ export default function MessageBubble({ message, currentUser }) {
   }
 
   return (
-    <div className={`message ${isSent ? 'sent' : 'received'} ${getBotClass()}`}>
+    <div className={cn(
+      "flex gap-3 max-w-4xl",
+      isSent ? "ml-auto flex-row-reverse" : "mr-auto"
+    )}>
       {!isSent && (
         <div
-          className="message-avatar"
-          style={isBot ? { background: getBotColor() } : {}}
+          className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center",
+            "font-bold text-white text-sm flex-shrink-0",
+            "shadow-lg"
+          )}
+          style={{ backgroundColor: isBot ? getBotColor() : '#667eea' }}
         >
           {message.user.charAt(0).toUpperCase()}
         </div>
       )}
-      <div className="message-content">
-        {!isSent && <div className="message-sender">{message.user}</div>}
+      <div className={cn(
+        "flex flex-col gap-1",
+        isSent ? "items-end" : "items-start"
+      )}>
+        {!isSent && (
+          <span
+            className="text-sm font-semibold px-2"
+            style={{ color: isBot ? getBotColor() : '#667eea' }}
+          >
+            {message.user}
+          </span>
+        )}
         <div
-          className="message-bubble"
+          className={cn(
+            "px-4 py-3 rounded-lg max-w-2xl",
+            "shadow-md transition-all duration-200",
+            isSent
+              ? "bg-primary text-primary-foreground rounded-br-sm"
+              : "bg-card border border-border rounded-bl-sm",
+            isBot && "border-l-4"
+          )}
           style={isBot ? { borderLeftColor: getBotColor() } : {}}
         >
-          {message.content}
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
         </div>
       </div>
     </div>
