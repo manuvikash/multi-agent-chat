@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Group Chat</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="name-screen" class="screen active">
+    <div class="name-card">
+      <div class="logo">💬</div>
+      <h1>AI Group Chat</h1>
+      <p>Join the conversation with an intelligent AI companion</p>
+      <div class="name-form">
+        <input type="text" id="name-input" placeholder="Enter your name..." maxlength="20" autocomplete="off" />
+        <button id="join-btn" class="primary-btn">Join Chat</button>
+      </div>
+    </div>
+  </div>
+  <div id="chat-screen" class="screen">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="header-left">
+          <div class="logo-small">💬</div>
+          <div class="header-info">
+            <h2>AI Group Chat</h2>
+            <p class="online-status">🟢 Online</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <span id="current-user" class="user-badge"></span>
+          <button id="settings-btn" class="icon-btn">⚙️</button>
+        </div>
+      </div>
+      <div id="messages" class="messages-area"></div>
+      <div id="typing-indicator" class="typing-indicator hidden">
+        <span class="typing-dots"><span></span><span></span><span></span></span>
+        <span class="typing-text">Bot is typing...</span>
+      </div>
+      <div class="input-area">
+        <input type="text" id="message-input" placeholder="Type a message (mention with @Bot)" autocomplete="off" />
+        <button id="send-btn" class="send-btn"><span class="send-icon">➤</span></button>
+      </div>
+    </div>
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-header">
+        <h3>Settings</h3>
+        <button id="close-settings" class="close-btn">✕</button>
+      </div>
+      <div class="settings-content">
+        <div class="setting-group">
+          <label>Bot Name</label>
+          <input type="text" id="bot-name" value="Bot" />
+        </div>
+        <div class="setting-group">
+          <label>Bot Personality / Backstory</label>
+          <textarea id="bot-personality" rows="3">You are a witty, warm guide for a group chat. Keep conversation inclusive and fun.</textarea>
+        </div>
+        <div class="setting-group">
+          <label>Tone</label>
+          <select id="bot-tone">
+            <option value="witty">Witty</option>
+            <option value="neutral">Neutral</option>
+            <option value="serious">Serious</option>
+            <option value="playful">Playful</option>
+            <option value="sassy">Sassy</option>
+            <option value="stoic">Stoic</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Formality</label>
+          <select id="bot-formality">
+            <option value="casual">Casual</option>
+            <option value="formal">Formal</option>
+            <option value="slang">Slang</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="bot-emoji" checked />
+            <span>Allow Emojis</span>
+          </label>
+        </div>
+        <div class="setting-group">
+          <label style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="bot-short-answers" />
+            <span>Prefer Short Answers</span>
+          </label>
+        </div>
+        <div class="setting-group">
+          <label>Max Consecutive Messages</label>
+          <input type="number" id="bot-max-consecutive" value="1" min="1" max="5" />
+        </div>
+        <button id="update-persona" class="primary-btn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
